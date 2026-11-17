@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>RS Angker - Streamer Horror</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#000;color:#eee;font-family:system-ui,sans-serif;overflow:hidden;user-select:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;object-fit:contain}
+#vg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,#000c 100%);z-index:4}
+.ov{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:#000d;text-align:center;padding:14px;z-index:20;overflow:auto}
+.ov h1{color:#d22;margin:4px;text-shadow:0 0 12px #f00}
+button{background:#7a1010;color:#fff;border:1px solid #c33;padding:10px 18px;margin:5px;font-size:16px;border-radius:6px;cursor:pointer}button:hover{background:#a11}
+.card{border:2px solid #555;border-radius:10px;padding:12px;margin:6px;width:150px;cursor:pointer;background:#111;font-size:15px}.card.sel{border-color:#e33;background:#2a0a0a}.card b{font-size:42px;display:block}
+.hud{position:fixed;pointer-events:none;z-index:5;text-shadow:0 0 3px #000,0 0 3px #000}
+.bar{width:130px;height:9px;background:#0007;border:1px solid #888;margin:3px 0}.bar i{display:block;height:100%}
+.ar{font-family:'Amiri','Traditional Arabic','Scheherazade New',serif;direction:rtl;color:#ffd75e}
+#js{position:fixed;left:50%;top:50%;width:min(95vw,95vh);height:min(95vw,95vh);transform:translate(-50%,-50%);display:none;z-index:15;pointer-events:none}
+#tc{display:none;position:fixed;inset:0;z-index:8;pointer-events:none}#tc button{position:absolute;pointer-events:auto;opacity:.7;width:56px;height:56px;border-radius:50%;padding:0}
+table{border-collapse:collapse;margin:8px;font-size:14px;text-align:left}td{padding:3px 10px;border-bottom:1px solid #333}kbd{background:#333;border:1px solid #777;padding:1px 7px;border-radius:4px}
+#in{position:fixed;inset:0;width:100%;height:100%;z-index:30;display:none;background:#000;object-fit:contain}#sk{position:fixed;right:12px;bottom:12px;z-index:31;display:none}input{background:#111;color:#fff;border:1px solid #c33;padding:6px;border-radius:5px;font-size:16px;text-align:center}.card canvas{display:block;margin:0 auto 4px}
+</style></head><body>
+<canvas id="c" width="480" height="270"></canvas><div id="vg"></div><canvas id="js" width="256" height="256"></canvas>
+<div class="hud" style="top:8px;left:8px"><span style="background:#e11;padding:2px 8px;border-radius:4px;font-weight:700">● LIVE</span> <span id="vw"></span> <span id="tm">00:00</span><canvas id="mm" width="90" height="90" style="display:block;margin-top:6px;background:#0008"></canvas></div>
+<div class="hud" id="mis" style="top:8px;right:8px;text-align:right;font-size:13px;max-width:46vw"></div>
+<div class="hud" id="bars" style="bottom:8px;left:8px;font-size:11px"></div>
+<div class="hud" id="chat" style="bottom:78px;left:8px;font-size:13px;width:min(300px,58vw)"></div>
+<div class="hud" id="sub" style="bottom:13%;width:100%;text-align:center;font-size:16px;color:#9f9"></div>
+<div class="hud" id="hint" style="bottom:24%;width:100%;text-align:center;color:#ff8;font-size:17px"></div>
+<div class="hud" id="ayat" style="top:22%;width:100%;text-align:center;display:none"></div>
+<div id="tc"><button id="bE" style="right:80px;bottom:90px">E</button><button id="bQ" style="right:14px;bottom:90px">Q</button><button id="bF" style="right:80px;bottom:24px">🔦</button><button id="bR" style="right:14px;bottom:24px">⚡</button><button id="bC" style="right:146px;bottom:57px">📢</button><button id="bD" style="right:146px;bottom:125px">🎧</button></div>
+
+<div class="ov" id="menu" style="display:flex"><h1>🏥 RS ANGKER 3D</h1><p>Kamu streamer horor. Kumpulkan potongan ayat, jawab soal sambung ayat Al-Qur'an (Juz 28, 29, 30), nyalakan generator, lalu kabur!</p>
+<div style="display:flex"><div class="card sel" id="cm"><canvas id="av0" width="80" height="110"></canvas>Cowok<br><small>Cowok · HP lebih tebal</small></div><div class="card" id="cf"><canvas id="av1" width="80" height="110"></canvas>Cewek<br><small>Cewek · Lari lebih lincah</small></div></div>
+<p>Nama karakter: <input id="nm" maxlength="12" value="Raka"></p><canvas id="tmv" width="360" height="110"></canvas><p style="font-size:13px">Tim yang menemani: Dimas, Sari, Bayu</p><div><button id="go">▶ MULAI SIARAN</button><button id="tb">📖 Tutorial Tombol</button><button id="hq">🖥 Grafik</button></div></div>
+<div class="ov" id="tut"><h1>Tutorial</h1><table>
+<tr><td><kbd>W A S D</kbd></td><td>Jalan (maju, kiri, mundur, kanan)</td></tr><tr><td><kbd>Mouse</kbd> / <kbd>← →</kbd></td><td>Lihat sekeliling (klik layar untuk kunci mouse)</td></tr>
+<tr><td><kbd>Shift</kbd></td><td>Lari (menguras stamina)</td></tr><tr><td><kbd>E</kbd></td><td>Ambil / buka pintu / tahan di generator</td></tr>
+<tr><td><kbd>Q</kbd></td><td>Baca ayat: hantu terdekat terpental &amp; pingsan (butuh ≥1 potongan ayat)</td></tr>
+<tr><td><kbd>F</kbd></td><td>Senter on/off (baterai habis kalau dinyalakan)</td></tr><tr><td><kbd>C</kbd></td><td>Panggil tim berkumpul &amp; memulihkan HP</td></tr>
+<tr><td><kbd>B</kbd></td><td>DJ Horror (beat) on/off — otomatis menyala saat dikejar</td></tr><tr><td><kbd>M</kbd></td><td>Minimap</td></tr><tr><td><kbd>N</kbd></td><td>Suara on/off</td></tr><tr><td><kbd>P</kbd> / <kbd>Esc</kbd></td><td>Pause</td></tr><tr><td><kbd>H</kbd></td><td>Tutorial</td></tr><tr><td><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> / klik</td><td>Jawab tantangan sambung ayat (pilihan potongan ayat)</td></tr></table>
+<p style="font-size:13px;max-width:560px">Misi: 1) kumpulkan 5 potongan ayat (tiap ayat memicu soal sambung ayat: benar = HP &amp; kekuatan ayat pulih + hantu pingsan, salah = hantu mengejar) 2) ambil kartu akses 💳 untuk pintu merah 3) nyalakan generator (tahan E 3 detik, hantu akan mengejar!) 4) kabur lewat pintu hijau. HP dan tim dekat membantu pulihkan kekuatan ayat. HP/layar HP: tombol di layar tersedia.</p><button id="tc2">Tutup</button></div>
+<div class="ov" id="pause"><h1>⏸ Pause</h1><button id="rs">Lanjut</button><button id="tb2">Tutorial</button><button id="hq2">🖥 Grafik</button><button id="rst">Ulangi</button></div>
+<canvas id="in" width="960" height="540"></canvas><button id="sk">Lewati ⏭</button>
+<div class="ov" id="qz"><h1 style="font-size:22px">🧠 TANTANGAN SAMBUNG AYAT</h1><div id="qp"></div><div id="qo"></div><div id="qr"></div></div>
+<div class="ov" id="end"><h1 id="et"></h1><div id="eb" style="max-width:600px"></div><button id="rst2">Main Lagi</button></div>
+
+<script>
+const $=i=>document.getElementById(i),cv=$('c'),ctx=cv.getContext('2d');let HQ=1,W,H,img,buf,zb;function setQ(hd){HQ=hd;W=hd?960:480;H=hd?540:270;cv.width=W;cv.height=H;ctx.imageSmoothingEnabled=false;img=ctx.createImageData(W,H);buf=new Uint32Array(img.data.buffer);zb=new Float32Array(W);cv.style.imageRendering=hd?'auto':'pixelated'}setQ(1);const TS=128;
+const MR=["####################","#..#.......#.......#","#..#..###..#..###..#","#.....#.#.....#.#..#","#..#..###..#..###..#","#..#.......#.......#","##.####.#######.####","#........#.........#","#.#####..#..#####..#","#.#...#.....#...#..#","#.....#..#..#......#","#.#####..#..#####..#","#........#.........#","##.####.############","#..#.......#.......#","#..#..###..#..###..#","#.....#.#..D..#.#..#","#..#..###..#..###..#","#..#.......#.......#","###############X####"];
+const MW=20,MH=20;let map,P,ghosts,mates,items,keys={},state='menu',char='m',tm,mute=false,showMM=true,lastT=0,nextScare,msgT,sayT,beatT,stepT,callCD,chatT,genP,shake=0;
+const FR=[["بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ","Dengan nama Allah Yang Maha Pengasih, Maha Penyayang."],["قُلْ هُوَ ٱللَّهُ أَحَدٌ","Katakanlah (Muhammad), “Dialah Allah, Yang Maha Esa.”"],["ٱللَّهُ ٱلصَّمَدُ","Allah tempat meminta segala sesuatu."],["لَمْ يَلِدْ وَلَمْ يُولَدْ","(Allah) tidak beranak dan tidak pula diperanakkan."],["وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ","Dan tidak ada sesuatu yang setara dengan Dia."]];
+/* ---------- tekstur & sprite ---------- */
+const rnd=(x,y)=>{let n=Math.sin(x*12.9898+y*78.233)*43758.5453;return n-Math.floor(n)};
+function mkTex(f){const t=new Uint32Array(4096);for(let y=0;y<64;y++)for(let x=0;x<64;x++){const[r,g,b]=f(x,y);t[y*64+x]=255<<24|(b|0)<<16|(g|0)<<8|(r|0)}return t}
+function ctex(f){const c=document.createElement('canvas');c.width=c.height=TS;const g=c.getContext('2d');g.scale(2,2);f(g);return new Uint32Array(g.getImageData(0,0,TS,TS).data.buffer.slice(0))}
+function wall(g,txt,col,blood){g.fillStyle='#d9e5dd';g.fillRect(0,0,64,64);g.fillStyle='#4f8f80';g.fillRect(0,36,64,28);g.fillStyle='#eee';g.fillRect(0,33,64,3);g.strokeStyle='#0004';for(let i=0;i<64;i+=16){g.strokeRect(i+.5,36.5,15,13);g.strokeRect(i+.5,49.5,15,14)}
+for(let k=0;k<7;k++){g.fillStyle='rgba(70,60,20,.2)';g.fillRect(rnd(k,1)*60,rnd(k,2)*30,3+rnd(k,3)*4,8+rnd(k,4)*20)}
+if(blood){g.fillStyle='#7a0f0f';g.fillRect(10,26,3,24);g.fillRect(9,48,5,4);g.fillRect(40,20,2,18)}
+if(txt){g.fillStyle=col;g.fillRect(5,7,54,17);g.fillStyle='#fff';let fs=10;g.font='bold '+fs+'px sans-serif';while(g.measureText(txt).width>48&&fs>4)g.font='bold '+(--fs)+'px sans-serif';g.textAlign='center';g.fillText(txt,32,18+(10-fs)/3)}}
+const SG={a:['IGD','#b22'],b:['FARMASI','#2a7'],c:['LAB','#1c58a8'],d:['RAWAT INAP','#1c58a8'],e:['KAMAR MAYAT','#222'],f:['R. OPERASI','#a22'],g:['RADIOLOGI','#1c58a8'],h:['ICU','#b22'],i:['RESEPSI','#1c58a8'],j:['','']};
+const T={'#':ctex(g=>wall(g,'',0,0))};for(const k in SG)T[k]=ctex(g=>wall(g,SG[k][0],SG[k][1],k=='e'||k=='f'||k=='j'));
+T.D=ctex(g=>{g.fillStyle='#8a1f1f';g.fillRect(0,0,64,64);g.fillStyle='#5a0f0f';g.fillRect(0,0,4,64);g.fillRect(60,0,4,64);g.fillRect(0,0,64,4);g.fillStyle='#9ec';g.fillRect(22,10,20,18);g.fillStyle='#ddd';g.fillRect(48,34,6,4);g.fillStyle='#fff';g.font='bold 8px sans-serif';g.textAlign='center';g.fillText('TERKUNCI',32,50)});
+T.X=ctex(g=>{g.fillStyle='#1d7a3a';g.fillRect(0,0,64,64);g.fillStyle='#0b4a20';g.fillRect(0,0,4,64);g.fillRect(60,0,4,64);g.fillStyle='#fff';g.font='bold 15px sans-serif';g.textAlign='center';g.fillText('EXIT',32,30);g.fillRect(14,38,36,4)});
+const spr=f=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');g.scale(2,2);f(g);return c};
+function ghost(c,t){c.fillStyle=t==2?'#000':'#111';c.fillRect(14,6,36,54);c.fillStyle=t==2?'#050505':'#ddd';c.beginPath();c.moveTo(16,64);c.lineTo(22,30);c.lineTo(42,30);c.lineTo(48,64);c.fill();
+c.fillStyle=t==2?'#222':'#e8e4dc';c.beginPath();c.ellipse(32,18,10,13,0,0,7);c.fill();c.fillStyle=t==2?'#fff':'#000';[28,36].forEach(x=>{c.beginPath();c.ellipse(x,16,2.5,4.5,0,0,7);c.fill()});
+c.fillStyle='#700';c.beginPath();c.ellipse(32,26,3,6,0,0,7);c.fill();if(t==1){c.fillStyle='#fff';c.fillRect(23,3,18,6);c.fillStyle='#c00';c.fillRect(31,3,2,6);c.fillRect(29,5,6,2);c.fillRect(24,40,6,14)}}
+const GS=[0,1,2].map(t=>spr(c=>ghost(c,t)));
+function rbx(c,x,y,s,o){const R=(a,b,w,h,col)=>{c.fillStyle=col;c.fillRect(x+a*s,y+b*s,w*s,h*s)};
+R(14,37,10,22,o.pants);R(26,37,10,22,o.pants);R(14,57,10,3,'#222');R(26,57,10,3,'#222');R(14,17,22,20,o.shirt);R(6,17,8,20,o.skin);R(36,17,8,20,o.skin);R(6,17,8,9,o.shirt);R(36,17,8,9,o.shirt);
+R(17,0,16,16,o.skin);R(16,-2,18,5,o.hair);if(o.fem){R(14,2,4,18,o.hair);R(32,2,4,18,o.hair)}R(21,6,2.4,2.4,'#111');R(27,6,2.4,2.4,'#111');R(22,11,6,1.6,'#611')}
+const NM=['Dimas','Sari','Bayu'],MC=[{shirt:'#2c7be5',pants:'#222',skin:'#f1c27d',hair:'#222'},{shirt:'#e84393',pants:'#445',skin:'#e0ac69',hair:'#3b2314',fem:1},{shirt:'#27ae60',pants:'#333',skin:'#c68642',hair:'#111'}];
+const MS=MC.map((o,i)=>spr(c=>{rbx(c,7,9,.9,o);c.fillStyle='#000a';c.fillRect(10,0,44,9);c.fillStyle='#fff';c.font='bold 8px sans-serif';c.textAlign='center';c.fillText(NM[i],32,8)}));
+let props=[];
+const IS={f:spr(c=>{c.shadowColor='#fd5';c.shadowBlur=14;c.fillStyle='#f3e2a0';c.fillRect(14,10,36,44);c.fillStyle='#a80';for(let i=0;i<5;i++)c.fillRect(20,18+i*7,24,2)}),k:spr(c=>{c.shadowColor='#f55';c.shadowBlur=10;c.fillStyle='#d33';c.fillRect(10,20,44,28);c.fillStyle='#fff';c.fillRect(14,24,12,12)}),g:spr(c=>{c.fillStyle='#456';c.fillRect(8,10,48,50);c.fillStyle='#fc0';c.fillRect(20,18,24,6);c.fillStyle='#222';c.fillRect(14,32,36,20)}),G:spr(c=>{c.fillStyle='#456';c.fillRect(8,10,48,50);c.fillStyle='#3f3';c.fillRect(20,18,24,6);c.fillStyle='#8f8';c.fillRect(14,32,36,20)})};
+/* ---------- audio (sintesis, offline) ---------- */
+let AC,MG,NB;
+function initA(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();MG.gain.value=mute?0:.8;MG.connect(AC.destination);NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+[55,58,82.4].forEach(f=>{const o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=f;fl.type='lowpass';fl.frequency.value=160;g.gain.value=.05;o.connect(fl);fl.connect(g);g.connect(MG);o.start()});}catch(e){}}
+function tone(f1,f2,d,v,ty='sine'){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=ty;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(MG);o.start();o.stop(t+d)}
+function noise(d,f,v,ty='lowpass'){if(!AC)return;const s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain(),t=AC.currentTime;s.buffer=NB;fl.type=ty;fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl);fl.connect(g);g.connect(MG);s.start();s.stop(t+d)}
+const SND={step:()=>noise(.09,350,.18),scream:()=>{tone(1000,250,1.1,.35,'sawtooth');noise(1.1,2600,.5,'bandpass');tone(70,40,.8,.6)},beat:()=>tone(65,40,.18,.7),pick:()=>{tone(520,1040,.5,.2);tone(780,1300,.6,.12)},creak:()=>tone(130,70,.9,.15,'sawtooth'),whisper:()=>noise(1.6,2000,.12,'bandpass'),ayat:()=>{tone(300,600,1,.2,'triangle');noise(.8,900,.1,'bandpass')},hit:()=>noise(.4,200,.6)};
+/* ---------- permainan ---------- */
+function reset(){map=MR.map(r=>r.split(''));[[4,6,'a'],[10,6,'b'],[17,6,'c'],[4,8,'d'],[4,11,'e'],[14,11,'f'],[4,13,'g'],[12,13,'h'],[3,1,'i'],[6,8,'j']].forEach(([x,y,c])=>{if(map[y][x]=='#')map[y][x]=c});props=[{x:2.5,y:4.5,s:'bed',sc:.55},{x:4.5,y:10.5,s:'bed',sc:.55},{x:14.5,y:10.5,s:'bed',sc:.55},{x:10.5,y:1.5,s:'bed',sc:.55},{x:8.5,y:7.5,s:'wc',sc:.5},{x:13.5,y:12.5,s:'wc',sc:.5},{x:4.5,y:12.5,s:'iv',sc:.6},{x:1.5,y:9.5,s:'iv',sc:.6},{x:16.5,y:18.5,s:'bed',sc:.55}];P={x:1.5,y:1.5,a:.4,hp:char=='m'?130:100,mhp:char=='m'?130:100,st:100,ay:100,bat:100,inv:0,key:false,gen:false,frag:0,got:[0,0,0,0,0],qc:0,qs:pickQ(),fl:true,vx:0,vy:0};
+ghosts=[[9.5,3.5,0],[14.5,9.5,1],[5.5,14.5,2]].map(([x,y,t])=>({x,y,t,mode:0,tm:0,stun:0,wx:x,wy:y}));
+mates=[['Dimas',1.5,3.5],['Sari',2.5,2.5],['Bayu',1.5,2.5]].map(([n,x,y],i)=>({n,x,y,i}));
+items=[{x:2.5,y:1.5,t:'f',i:0},{x:17.5,y:3.5,t:'f',i:1},{x:14.5,y:7.5,t:'f',i:2},{x:4.5,y:9.5,t:'f',i:3},{x:13.5,y:15.5,t:'f',i:4},{x:8.5,y:5.5,t:'k'},{x:8.5,y:14.5,t:'g'}];
+tm=0;nextScare=25;sayT=8;beatT=0;stepT=0;callCD=0;chatT=1;genP=0;msgT=0;$('chat').innerHTML='';$('sub').textContent='';$('ayat').style.display='none'}
+const solid=(x,y)=>{x|=0;y|=0;if(x<0||y<0||x>=MW||y>=MH)return true;const c=map[y][x];return c!='.'};
+function mv(o,dx,dy,r=.22){if(!solid(o.x+dx+Math.sign(dx)*r,o.y))o.x+=dx;if(!solid(o.x,o.y+dy+Math.sign(dy)*r))o.y+=dy}
+function los(a,b){const d=Math.hypot(b.x-a.x,b.y-a.y),n=d/.2|0;for(let i=1;i<n;i++){if(solid(a.x+(b.x-a.x)*i/n,a.y+(b.y-a.y)*i/n))return false}return true}
+const USR=['kuntilanak_fans','budi99','gamerhoror','sarahh','pocongkece','ani_streams','RajaJumpscare','dewi_', 'mas_joko','nopal'],CH=['gas terus kak!','jangan masuk situ woi','haha takut dia','ada di belakang!!','mantap tim nya','baca ayat dulu kak','suaranya serem','first!','subscribe done','ya Allah merinding','awas ada hantu','LARI!!','keren grafiknya','😱😱😱','kakak jangan sendirian'],SC=['AAAAAA 😱😱','KAGET ANJIR','MAMAAAA','HANTUNYA!!!','wkwkw teriak','LARI LARI LARI'];
+function chat(m,u){const d=document.createElement('div');d.innerHTML='<b style="color:hsl('+(Math.random()*360|0)+',80%,70%)">'+(u||USR[Math.random()*USR.length|0])+'</b> '+m;$('chat').appendChild(d);while($('chat').children.length>6)$('chat').removeChild($('chat').firstChild)}
+const SAY=['Jangan jauh-jauh dong!','Aku denger suara tangisan...','Cari potongan ayatnya, cepat!','Tadi ada bayangan lewat.','Bang, senternya jangan habis!','Kita pasti keluar dari sini.','Dingin banget di sini...','Hati-hati sama suster itu!'];
+function say(t,n){$('sub').textContent=(n?n+': ':'')+t;msgT=3.5}
+function jumpscare(short){const c=$('js'),g=c.getContext('2d');g.clearRect(0,0,256,256);g.fillStyle='#000';g.fillRect(0,0,256,256);g.save();g.translate(Math.random()*10-5,0);g.scale(4,4);ghost(g,Math.random()*3|0);g.restore();c.style.display='block';SND.scream();shake=.6;setTimeout(()=>c.style.display='none',short?350:800);for(let i=0;i<3;i++)chat(SC[Math.random()*SC.length|0])}
+function hit(g){if(P.inv>0)return;P.hp-=25;P.inv=3;jumpscare();SND.hit();g.stun=3;g.mode=0;g.x=Math.min(18,Math.max(1,P.x+(Math.random()<.5?-8:8)));g.y=Math.min(18,Math.max(1,P.y+(Math.random()<.5?-8:8)));if(P.hp<=0)finish(false)}
+function ayat(){if(P.frag<1){say('Kumpulkan potongan ayat dulu!');return}if(P.ay<40){say('Kekuatan ayat belum cukup...');return}P.ay-=40;SND.ayat();let n=0;ghosts.forEach(g=>{const d=Math.hypot(g.x-P.x,g.y-P.y);if(d<7){g.stun=6;g.mode=0;const a=Math.atan2(g.y-P.y,g.x-P.x);g.x=Math.min(18,Math.max(1,g.x+Math.cos(a)*4));g.y=Math.min(18,Math.max(1,g.y+Math.sin(a)*4));n++}});say(n?'Allahu Akbar! Hantu terpental!':'Tidak ada hantu dekat...');chat('MasyaAllah 🙏')}
+function interact(){let best=null,bd=1.5;items.forEach(it=>{if(it.got)return;const d=Math.hypot(it.x-P.x,it.y-P.y);if(d<bd&&it.t!='g'){bd=d;best=it}});
+if(best){best.got=1;SND.pick();if(best.t=='f'){P.frag++;P.got[best.i]=1;const f=FR[best.i];const a=$('ayat');a.innerHTML='<div class="ar" style="font-size:clamp(24px,5vw,44px)">'+f[0]+'</div><div style="font-size:15px;background:#000a;display:inline-block;padding:4px 10px;margin-top:6px">'+f[1]+' ('+P.frag+'/5)</div>';a.style.display='block';setTimeout(()=>a.style.display='none',6000);ghosts.forEach(g=>g.mode=1,g.tm=5);ghosts.forEach(g=>{g.mode=1;g.tm=5});if(P.frag==3){ghosts.push({x:10.5,y:8.5,t:1,mode:1,tm:9,stun:0,wx:10,wy:8});say('Ada satu hantu lagi muncul!');SND.whisper()}setTimeout(quiz,2800)}
+else{P.key=true;say('Kartu akses didapat! Cari pintu merah.');}return}
+const fx=P.x+Math.cos(P.a)*.9,fy=P.y+Math.sin(P.a)*.9,cx=fx|0,cy=fy|0,c=map[cy]&&map[cy][cx];
+if(c=='D'){if(P.key){map[cy][cx]='.';SND.creak();say('Pintu terbuka...')}else say('Terkunci. Butuh kartu akses 💳')}
+else if(c=='X'){if(P.frag>=5&&P.gen)finish(true);else say(P.gen?'Kumpulkan 5 potongan ayat dulu!':'Pintu mati. Nyalakan generator dulu!')}}
+const QZ=[["Juz 30 · QS. Al-Kafirun", "قُلْ يَا أَيُّهَا الْكَافِرُونَ ...", ["لَا أَعْبُدُ مَا تَعْبُدُونَ", "لَكُمْ دِينُكُمْ وَلِيَ دِينِ", "وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", "ٱللَّهُ ٱلصَّمَدُ"], "Al-Kafirun ayat 2: “Aku tidak akan menyembah apa yang kamu sembah.”", 0], ["Juz 30 · QS. Al-Kautsar", "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ ...", ["فَصَلِّ لِرَبِّكَ وَانْحَرْ", "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", "مِن شَرِّ مَا خَلَقَ", "مَلِكِ النَّاسِ"], "Al-Kautsar ayat 2: “Maka laksanakanlah salat karena Tuhanmu, dan berkurbanlah.”", 0], ["Juz 30 · QS. Al-'Asr", "وَالْعَصْرِ ...", ["إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ", "وَتَوَاصَوْا بِالْحَقِّ", "وَالْفَجْرِ وَلَيَالٍ عَشْرٍ"], "Al-'Asr ayat 2: “Sungguh, manusia berada dalam kerugian.”", 0], ["Juz 30 · QS. An-Nasr", "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ ...", ["وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا", "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ", "إِنَّهُ كَانَ تَوَّابًا", "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ"], "An-Nasr ayat 2: “Dan engkau melihat manusia berbondong-bondong masuk agama Allah.”", 0], ["Juz 30 · QS. An-Nas", "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ...", ["مَلِكِ النَّاسِ", "إِلَٰهِ النَّاسِ", "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ", "ٱللَّهُ ٱلصَّمَدُ"], "An-Nas ayat 2: “Raja manusia.”", 0], ["Juz 29 · QS. Al-Mulk ayat 1", "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ ...", ["الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا", "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا", "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ", "إِنَّ الَّذِينَ يَخْشَوْنَ رَبَّهُم بِالْغَيْبِ لَهُم مَّغْفِرَةٌ وَأَجْرٌ كَبِيرٌ"], "Al-Mulk ayat 2: “(Dia) yang menciptakan mati dan hidup, untuk menguji siapa di antara kamu yang lebih baik amalnya.”", 1], ["Juz 29 · QS. Al-Qalam", "نٓ ۚ وَالْقَلَمِ وَمَا يَسْطُرُونَ ...", ["مَا أَنتَ بِنِعْمَةِ رَبِّكَ بِمَجْنُونٍ", "وَإِنَّ لَكَ لَأَجْرًا غَيْرَ مَمْنُونٍ", "وَإِنَّكَ لَعَلَىٰ خُلُقٍ عَظِيمٍ", "فَسَتُبْصِرُ وَيُبْصِرُونَ"], "Al-Qalam ayat 2: “Berkat nikmat Tuhanmu, engkau (Muhammad) bukanlah orang gila.”", 1], ["Juz 29 · QS. Al-Muzzammil", "يَا أَيُّهَا الْمُزَّمِّلُ ...", ["قُمِ اللَّيْلَ إِلَّا قَلِيلًا", "نِّصْفَهُ أَوِ انقُصْ مِنْهُ قَلِيلًا", "أَوْ زِدْ عَلَيْهِ وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا", "إِنَّا سَنُلْقِي عَلَيْكَ قَوْلًا ثَقِيلًا"], "Al-Muzzammil ayat 2: “Bangunlah (untuk salat) pada malam hari, kecuali sebagian kecil.”", 1], ["Juz 29 · QS. Al-Muddatsir", "يَا أَيُّهَا الْمُدَّثِّرُ ...", ["قُمْ فَأَنذِرْ", "وَرَبَّكَ فَكَبِّرْ", "وَثِيَابَكَ فَطَهِّرْ", "وَالرُّجْزَ فَاهْجُرْ"], "Al-Muddatsir ayat 2: “Bangunlah, lalu berilah peringatan!”", 1], ["Juz 29 · QS. Al-Haqqah", "الْحَاقَّةُ ...", ["مَا الْحَاقَّةُ", "وَمَا أَدْرَاكَ مَا الْحَاقَّةُ", "كَذَّبَتْ ثَمُودُ وَعَادٌ بِالْقَارِعَةِ", "فَأَمَّا ثَمُودُ فَأُهْلِكُوا بِالطَّاغِيَةِ"], "Al-Haqqah ayat 2: “Apakah hari kiamat itu?”", 1], ["Juz 28 · QS. Al-Hasyr ayat 24", "هُوَ اللَّهُ الْخَالِقُ الْبَارِئُ الْمُصَوِّرُ ...", ["لَهُ الْأَسْمَاءُ الْحُسْنَىٰ", "هُوَ الرَّحْمَٰنُ الرَّحِيمُ", "عَالِمُ الْغَيْبِ وَالشَّهَادَةِ", "سُبْحَانَ اللَّهِ عَمَّا يُشْرِكُونَ"], "Al-Hasyr ayat 24: “Dia memiliki nama-nama yang indah.”", 2], ["Juz 28 · QS. Ash-Shaff", "يَا أَيُّهَا الَّذِينَ آمَنُوا لِمَ تَقُولُونَ مَا لَا تَفْعَلُونَ ...", ["كَبُرَ مَقْتًا عِندَ اللَّهِ أَن تَقُولُوا مَا لَا تَفْعَلُونَ", "إِنَّ اللَّهَ يُحِبُّ الَّذِينَ يُقَاتِلُونَ فِي سَبِيلِهِ صَفًّا", "سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ", "وَإِذْ قَالَ مُوسَىٰ لِقَوْمِهِ"], "Ash-Shaff ayat 3: “(Itu) sangat dibenci di sisi Allah jika kamu mengatakan apa yang tidak kamu kerjakan.”", 2], ["Juz 28 · QS. Al-Jumu'ah ayat 9", "يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ فَاسْعَوْا إِلَىٰ ذِكْرِ اللَّهِ وَذَرُوا الْبَيْعَ ...", ["ذَٰلِكُمْ خَيْرٌ لَّكُمْ إِن كُنتُمْ تَعْلَمُونَ", "فَإِذَا قُضِيَتِ الصَّلَاةُ فَانتَشِرُوا فِي الْأَرْضِ", "وَابْتَغُوا مِن فَضْلِ اللَّهِ", "وَاذْكُرُوا اللَّهَ كَثِيرًا لَّعَلَّكُمْ تُفْلِحُونَ"], "Al-Jumu'ah ayat 9: “Yang demikian itu lebih baik bagimu jika kamu mengetahui.”", 2], ["Juz 28 · QS. At-Talaq", "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ...", ["وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ", "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مِنْ أَمْرِهِ يُسْرًا", "وَمَن يَتَّقِ اللَّهَ يُكَفِّرْ عَنْهُ سَيِّئَاتِهِ", "لِيُنفِقْ ذُو سَعَةٍ مِّن سَعَتِهِ"], "At-Talaq ayat 3: “Dan Dia memberinya rezeki dari arah yang tidak disangka-sangka.”", 2], ["Juz 28 · QS. At-Tahrim ayat 6", "يَا أَيُّهَا الَّذِينَ آمَنُوا قُوا أَنفُسَكُمْ وَأَهْلِيكُمْ نَارًا ...", ["وَقُودُهَا النَّاسُ وَالْحِجَارَةُ", "يَا أَيُّهَا الَّذِينَ كَفَرُوا لَا تَعْتَذِرُوا الْيَوْمَ", "يَا أَيُّهَا الَّذِينَ آمَنُوا تُوبُوا إِلَى اللَّهِ تَوْبَةً نَّصُوحًا", "يَا أَيُّهَا النَّبِيُّ جَاهِدِ الْكُفَّارَ وَالْمُنَافِقِينَ"], "At-Tahrim ayat 6: “Bahan bakarnya adalah manusia dan batu.”", 2]];
+function pickQ(){const sh=a=>a.slice().sort(()=>Math.random()-.5),ix=QZ.map((q,i)=>i);let r=[0,1,2].map(j=>sh(ix.filter(i=>QZ[i][4]==j))[0]);r=r.concat(sh(ix.filter(i=>!r.includes(i))).slice(0,2));return sh(r)}
+let qq=null;
+function quiz(){if(state!='play')return;const q=QZ[P.qs[(P.frag-1)%5]];state='quiz';if(document.exitPointerLock)document.exitPointerLock();const o=q[2].map((t,i)=>({t,ok:i==0}));o.sort(()=>Math.random()-.5);qq={o,q,done:0,res:0};
+$('qp').innerHTML='<div style="margin:6px">'+q[0]+' — sambung ayat berikut! Pilih <b>A, B, C, atau D</b></div><div class="ar" style="font-size:28px;margin:8px">'+q[1]+'</div>';
+$('qo').innerHTML=o.map((x,i)=>'<button class="ar opt" style="display:block;width:min(92vw,520px);font-size:22px" data-i="'+i+'"><span style="direction:ltr;font-size:14px;opacity:.7">['+'ABCD'[i]+']</span> '+x.t+'</button>').join('');$('qr').innerHTML='';show('qz',1);
+document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>ansQ(+b.dataset.i))}
+function ansQ(i){if(!qq||qq.done||!qq.o[i])return;qq.done=1;qq.res=qq.o[i].ok;if(qq.res)P.qc++;
+document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(qq.o[j].ok)b.style.background='#157a2a';else if(j==i)b.style.background='#555'});
+$('qr').innerHTML='<p>🗣 <b>'+PN+'</b> membaca: <span class="ar" style="font-size:22px">'+qq.o[i].t+'</span></p><p style="color:'+(qq.res?'#6f6':'#f66')+';font-size:18px">'+(qq.res?'✅ Benar! Kekuatan ayat pulih &amp; hantu pingsan.':'❌ Salah! Jawaban yang benar: '+'ABCD'[qq.o.findIndex(x=>x.ok)]+'. Hantu mengejarmu.')+'</p><p style="font-size:14px;max-width:520px">'+qq.q[3]+'</p><button id="qn">Lanjut ▶ (Enter)</button>';$('qn').onclick=closeQ}
+function closeQ(){if(!qq||!qq.done)return;show('qz',0);state='play';
+if(qq.res){P.ay=100;P.hp=Math.min(P.mhp,P.hp+20);ghosts.forEach(g=>g.stun=5);SND.ayat();say('Allahu Akbar!');chat('MasyaAllah jawabannya benar 🙏')}
+else{ghosts.forEach(g=>{g.mode=1;g.tm=8});SND.whisper();setTimeout(()=>jumpscare(true),600);chat('YAH SALAH 😱')}qq=null}
+function finish(win){if(state!='play')return;state='end';if(document.exitPointerLock)document.exitPointerLock();$('end').style.display='flex';$('et').textContent=win?'🌅 KAMU SELAMAT!':'💀 KAMU TERTANGKAP';$('et').style.color=win?'#5f5':'#d22';
+$('eb').innerHTML=win?'<p>Siaran selesai dengan '+$('vw').textContent+' penonton. Tantangan sambung ayat benar: '+P.qc+'/5. Surat Al-Ikhlas utuh:</p>'+FR.map(f=>'<div class="ar" style="font-size:28px">'+f[0]+'</div>').join(''):'<p>Hantu terlalu kuat. Baca ayat (Q) dan jangan sendirian!</p>'}
+function update(dt){tm+=dt;P.inv=Math.max(0,P.inv-dt);shake=Math.max(0,shake-dt);
+let turn=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);P.a+=turn*2.4*dt;
+let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+(-P.vy||0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0)+(P.vx||0);const mvg=Math.hypot(f,s);
+const run=(keys.ShiftLeft||keys.ShiftRight||keys.run)&&P.st>3&&mvg>0;P.st=Math.min(100,Math.max(0,P.st+(run?-22:12)*dt));
+const sp=(run?(char=='f'?4.2:3.6):2.2)*dt;if(mvg>0){const n=Math.max(1,mvg),dx=Math.cos(P.a),dy=Math.sin(P.a);mv(P,(dx*f-dy*s)/n*sp,(dy*f+dx*s)/n*sp);stepT-=dt;if(stepT<=0){SND.step();stepT=run?.28:.45}}
+P.bat=Math.min(100,Math.max(0,P.bat+(P.fl?-1.6:3)*dt));if(P.bat<=0)P.fl=false;
+const nm=mates.filter(m=>Math.hypot(m.x-P.x,m.y-P.y)<3).length;P.ay=Math.min(100,P.ay+(1.5+nm*1.2)*dt);if(nm&&P.hp<P.mhp)P.hp=Math.min(P.mhp,P.hp+.5*nm*dt);callCD=Math.max(0,callCD-dt);
+// tim
+mates.forEach((m,i)=>{const a=P.a+Math.PI+(i-1)*.9,tx=P.x+Math.cos(a)*1.4,ty=P.y+Math.sin(a)*1.4,d=Math.hypot(tx-m.x,ty-m.y);if(d>9){m.x=P.x;m.y=P.y}else if(d>.4){const sp2=Math.min(3.2,1+d)*dt;mv(m,(tx-m.x)/d*sp2,(ty-m.y)/d*sp2,.15)}});
+// hantu
+let near=99;ghosts.forEach(g=>{const dx=P.x-g.x,dy=P.y-g.y,d=Math.hypot(dx,dy);near=Math.min(near,d);if(g.stun>0){g.stun-=dt;return}
+if(!g.mode&&(d<7&&los(g,P)||genP>0))g.mode=1,g.tm=7,SND.whisper();if(g.mode){g.tm-=dt;if(g.tm<=0&&genP<=0)g.mode=0;const v=(1.3+P.frag*.28+(char=='f'?0:0))*dt;g.x+=dx/d*v;g.y+=dy/d*v}
+else{const wd=Math.hypot(g.wx-g.x,g.wy-g.y);if(wd<.5)g.wx=1.5+Math.random()*17,g.wy=1.5+Math.random()*17;else{g.x+=(g.wx-g.x)/wd*.9*dt;g.y+=(g.wy-g.y)/wd*.9*dt}}
+if(d<.65)hit(g)});
+// jantung
+beatT-=dt;if(near<6&&beatT<=0){SND.beat();setTimeout(SND.beat,180);beatT=.4+near*.12}
+// generator
+const gn=items[6],gd=Math.hypot(gn.x-P.x,gn.y-P.y);if(!P.gen&&gd<1.6&&keys.KeyE){genP+=dt;if(genP>=3){P.gen=true;genP=0;gn.t='G';say('Generator menyala! Cari pintu keluar hijau.');SND.pick();chat('GENERATORNYA NYALA 🔥')}}else if(genP>0&&!keys.KeyE){genP=Math.max(0,genP-dt*2)}
+// event acak
+nextScare-=dt;if(nextScare<=0){nextScare=30+Math.random()*30;if(Math.random()<.5)jumpscare(true);else{SND.creak();SND.whisper();shake=.3}}
+sayT-=dt;if(sayT<=0){sayT=12+Math.random()*10;const m=mates[Math.random()*3|0];say(SAY[Math.random()*SAY.length|0],m.n)}
+chatT-=dt;if(chatT<=0){chatT=2+Math.random()*3;chat(CH[Math.random()*CH.length|0])}
+if(msgT>0){msgT-=dt;if(msgT<=0)$('sub').textContent=''}
+// hint
+let h='';items.forEach(it=>{if(!it.got&&it.t!='g'&&Math.hypot(it.x-P.x,it.y-P.y)<1.5)h='[E] Ambil '+(it.t=='f'?'potongan ayat':'kartu akses')});if(!P.gen&&gd<1.6)h='Tahan [E] untuk menyalakan generator '+(genP>0?(genP/3*100|0)+'%':'');
+const fx=P.x+Math.cos(P.a)*.9,fy=P.y+Math.sin(P.a)*.9,c=map[fy|0]&&map[fy|0][fx|0];if(c=='D')h='[E] Buka pintu';if(c=='X')h='[E] Keluar';$('hint').textContent=h;
+return near}
+/* ---------- render ---------- */
+function render(near){const dx=Math.cos(P.a),dy=Math.sin(P.a),px=-dy*.66,py=dx*.66,fl=P.fl&&P.bat>0;let flick=1;if(near<4&&Math.random()<.35)flick=.3+Math.random()*.4;else if(fl&&P.bat<20&&Math.random()<.4)flick=.4;const k=(fl?1.8:.4)*flick,lf=flick<1?.3:1;
+for(let y=(H/2|0)+1;y<H;y++){const rd=H/(2*(y-H/2)),s=Math.min(1,k/(1+rd*rd*.09)),sx=rd*2*px/W,sy=rd*2*py/W;let fx=P.x+rd*(dx-px),fy=P.y+rd*(dy-py);const yc=H-1-y;
+for(let x=0;x<W;x++){const v=(((fx|0)+(fy|0))&1?85:55)*s;let u=30*s,lm=0;const gx=fx/3,gy=fy/3,ax=gx-Math.floor(gx),ay=gy-Math.floor(gy);if(ax>.35&&ax<.65&&ay>.35&&ay<.65&&rnd(Math.floor(gx),Math.floor(gy))>.35){u=(125+rnd(x>>2,y>>2)*10)*Math.min(1,s*3+.25)*lf;lm=1}buf[y*W+x]=255<<24|(v|0)<<16|(v*.92|0)<<8|(v*.85|0);buf[yc*W+x]=lm?(255<<24|(u|0)<<16|(u*.97|0)<<8|(u*.9|0)):(255<<24|(u*1.2|0)<<16|(u|0)<<8|(u*.9|0));fx+=sx;fy+=sy}}
+for(let x=0;x<W;x++){const cx=2*x/W-1,rx=dx+px*cx,ry=dy+py*cx;let mx=P.x|0,my=P.y|0;const ddx=Math.abs(1/rx),ddy=Math.abs(1/ry);let sx,sy,sdx,sdy,side=0,c;
+if(rx<0){sx=-1;sdx=(P.x-mx)*ddx}else{sx=1;sdx=(mx+1-P.x)*ddx}if(ry<0){sy=-1;sdy=(P.y-my)*ddy}else{sy=1;sdy=(my+1-P.y)*ddy}
+for(let i=0;i<40;i++){if(sdx<sdy){sdx+=ddx;mx+=sx;side=0}else{sdy+=ddy;my+=sy;side=1}c=map[my]&&map[my][mx];if(c===undefined||c!='.')break}
+const pd=Math.max(.05,side?sdy-ddy:sdx-ddx);zb[x]=pd;const lh=H/pd|0,y0=(H-lh)/2|0;let wx=side?P.x+pd*rx:P.y+pd*ry;wx-=Math.floor(wx);let tx=wx*TS|0;if((side==0&&rx>0)||(side==1&&ry<0))tx=TS-1-tx;
+const tex=T[c]||T['#'],sh=(Math.min(1,k/(1+pd*pd*.09))*(side?.75:1))*256|0;
+for(let y=Math.max(0,y0);y<Math.min(H,y0+lh);y++){const col=tex[(((y-y0)*TS/lh)&(TS-1))*TS+tx];buf[y*W+x]=255<<24|((col>>16&255)*sh>>8)<<16|((col>>8&255)*sh>>8)<<8|((col&255)*sh>>8)}}
+ctx.putImageData(img,0,0);
+const L=[];props.forEach(p=>L.push({x:p.x,y:p.y,s:PS[p.s],sc:p.sc,al:1}));ghosts.forEach(g=>L.push({x:g.x,y:g.y,s:GS[g.t],sc:1,al:.88,fl:1}));mates.forEach(m=>L.push({x:m.x,y:m.y,s:MS[m.i],sc:.85,al:1}));items.forEach(i=>{if(!i.got)L.push({x:i.x,y:i.y,s:IS[i.t],sc:i.t=='g'||i.t=='G'?.6:.3,al:1,glow:1})});
+L.forEach(o=>{o.d=(o.x-P.x)**2+(o.y-P.y)**2});L.sort((a,b)=>b.d-a.d);const inv=1/(px*dy-dx*py);
+L.forEach(o=>{const sx=o.x-P.x,sy=o.y-P.y,tX=inv*(dy*sx-dx*sy),tY=inv*(-py*sx+px*sy);if(tY<.25)return;const scr=W/2*(1+tX/tY),size=Math.abs(H/tY)*o.sc,bot=H/2+H/(2*tY)-(o.fl?Math.sin(tm*2+o.x)*size*.05:0),top=bot-size,x0=scr-size/2;
+ctx.globalAlpha=Math.min(1,k/(1+tY*tY*.09)+(o.glow?.3:.05))*o.al;for(let s=Math.max(0,x0|0);s<Math.min(W,x0+size);s++){if(tY<zb[s]){const sw=o.s.width;ctx.drawImage(o.s,Math.min(sw-1,(s-x0)*sw/size|0),0,1,sw,s,top,1,size)}}});ctx.globalAlpha=1;
+if(P.inv>2.5){ctx.fillStyle='#a008';ctx.fillRect(0,0,W,H)}
+for(let i=0;i<(HQ?900:350);i++){ctx.fillStyle='rgba(255,255,255,'+Math.random()*.06+')';ctx.fillRect(Math.random()*W,Math.random()*H,HQ?2:1,HQ?2:1)}
+cv.style.transform=shake>0?'translate('+(Math.random()*12-6)*shake+'px,'+(Math.random()*12-6)*shake+'px)':'';}
+function hud(){const m=tm|0;$('tm').textContent=String(m/60|0).padStart(2,'0')+':'+String(m%60).padStart(2,'0');$('vw').textContent='👁 '+(1200+(tm*7|0)+P.frag*300).toLocaleString('id-ID');
+const b=(l,v,c)=>'<div>'+l+'<div class="bar"><i style="width:'+Math.max(0,v)+'%;background:'+c+'"></i></div></div>';
+$('bars').innerHTML=b('❤ HP',P.hp/P.mhp*100,'#d33')+b('🏃 Stamina',P.st,'#3c6')+b('📖 Kekuatan Ayat (Q)',P.ay,'#fc3')+b('🔦 Baterai (F)',P.bat,'#6af');
+$('mis').innerHTML='<b>MISI</b><br>'+(P.frag>=5?'✅':'⬜')+' Potongan ayat '+P.frag+'/5<br>'+(P.key?'✅':'⬜')+' Kartu akses 💳<br>'+(P.gen?'✅':'⬜')+' Generator<br>'+(P.frag>=5&&P.gen?'➡ <b>KABUR ke pintu hijau!</b>':'⬜ Kabur')+'<br>'+P.got.map((g,i)=>g?'<span class="ar" style="font-size:15px">'+FR[i][0]+'</span><br>':'').join('');
+if(showMM){const g=$('mm').getContext('2d');g.clearRect(0,0,90,90);for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const c=map[y][x];if(c!='.'){g.fillStyle=c=='D'?'#c33':c=='X'?'#3c3':'#555';g.fillRect(x*4.5,y*4.5,4.5,4.5)}}
+items.forEach(i=>{if(!i.got){g.fillStyle=i.t=='f'?'#fd5':'#6cf';g.fillRect(i.x*4.5-1,i.y*4.5-1,3,3)}});mates.forEach(m=>{g.fillStyle='#4f4';g.fillRect(m.x*4.5-1,m.y*4.5-1,3,3)});ghosts.forEach(h=>{if(Math.hypot(h.x-P.x,h.y-P.y)<6){g.fillStyle='#f33';g.fillRect(h.x*4.5-2,h.y*4.5-2,4,4)}});g.fillStyle='#fff';g.fillRect(P.x*4.5-2,P.y*4.5-2,4,4);g.strokeStyle='#fff';g.beginPath();g.moveTo(P.x*4.5,P.y*4.5);g.lineTo(P.x*4.5+Math.cos(P.a)*7,P.y*4.5+Math.sin(P.a)*7);g.stroke()}$('mm').style.display=showMM?'block':'none'}
+function loop(t){requestAnimationFrame(loop);const rdt=(t-lastT)/1000||0,dt=Math.min(.05,rdt);lastT=t;if(state=='intro'){introDraw(dt);return}if(state!='play')return;const near=update(dt);if(state!='play')return;djTick(djOn||near<5.5);render(near);hud();perf(rdt)}
+/* ---------- kontrol & menu ---------- */
+const show=(id,v)=>$(id).style.display=v?'flex':'none';
+function start(){initA();reset();state='play';['menu','tut','pause','end'].forEach(i=>show(i,0));say('Halo guys, kita live dari RS angker! Tim, ayo jalan!',PN);chat('LIVE START 🔥')}
+function pause(v){if(state=='play'&&v){state='pause';show('pause',1);if(document.exitPointerLock)document.exitPointerLock()}else if(state=='pause'&&!v){state='play';show('pause',0);show('tut',0)}}
+function tut(v){if(v){show('tut',1);$('tut').dataset.p=state}else{show('tut',0)}}
+$('cm').onclick=()=>{char='m';$('cm').classList.add('sel');$('cf').classList.remove('sel')};$('cf').onclick=()=>{char='f';$('cf').classList.add('sel');$('cm').classList.remove('sel')};
+$('go').onclick=start;$('tb').onclick=()=>tut(1);$('tb2').onclick=()=>tut(1);$('tc2').onclick=()=>tut(0);$('rs').onclick=()=>pause(0);$('rst').onclick=start;$('rst2').onclick=start;
+function mute_(){mute=!mute;if(MG)MG.gain.value=mute?0:.8;say(mute?'Suara dimatikan':'Suara dinyalakan')}
+addEventListener('keydown',e=>{if(e.repeat&&e.code!='KeyE'){keys[e.code]=true;return}keys[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+if(state=='intro'){if(e.code=='Enter'||e.code=='Escape'||e.code=='Space')endIntro();return}if(state=='quiz'){const n=+e.key,l=e.key.length==1?'abcd'.indexOf(e.key.toLowerCase()):-1;if(n>=1&&n<=4)ansQ(n-1);if(l>=0)ansQ(l);if(e.code=='Enter')closeQ();return}if(e.code=='KeyH'){$('tut').style.display=='flex'?tut(0):tut(1)}if(e.code=='KeyN')mute_();
+if(e.code=='KeyP'||e.code=='Escape'){if(state=='play')pause(1);else if(state=='pause'&&$('tut').style.display!='flex')pause(0);else if($('tut').style.display=='flex')tut(0)}
+if(state!='play')return;if(e.code=='KeyE')interact();if(e.code=='KeyQ')ayat();if(e.code=='KeyF'){if(P.bat>5)P.fl=!P.fl;else say('Baterai habis, tunggu terisi...')}
+if(e.code=='KeyB'){djOn=!djOn;say(djOn?'🎧 DJ Horror ON':'🎧 DJ OFF')}if(e.code=='KeyM')showMM=!showMM;if(e.code=='KeyC'){if(callCD>0)say('Tunggu sebentar...');else{callCD=20;mates.forEach((m,i)=>{m.x=P.x-Math.cos(P.a)*(1+i*.3);m.y=P.y-Math.sin(P.a)*(1+i*.3);if(solid(m.x,m.y)){m.x=P.x;m.y=P.y}});P.hp=Math.min(P.mhp,P.hp+10);say('Kita kumpul! Tenang, semua aman.','Tim')}}});
+addEventListener('keyup',e=>keys[e.code]=false);addEventListener('blur',()=>{keys={}});
+cv.addEventListener('click',()=>{if(state=='play'&&cv.requestPointerLock&&!('ontouchstart' in window))cv.requestPointerLock()});
+addEventListener('mousemove',e=>{if(state=='play'&&document.pointerLockElement==cv)P.a+=e.movementX*.003});
+document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&state=='play'&&!('ontouchstart' in window))pause(1)});
+/* sentuh (HP) */
+if('ontouchstart' in window){$('tc').style.display='block';let L=null,R=null;const t0={};
+addEventListener('touchstart',e=>{for(const t of e.changedTouches){if(e.target.tagName=='BUTTON')continue;if(t.clientX<innerWidth/2&&!L)L={id:t.identifier,x:t.clientX,y:t.clientY};else if(!R)R={id:t.identifier,x:t.clientX}}});
+addEventListener('touchmove',e=>{for(const t of e.changedTouches){if(L&&t.identifier==L.id){P&&(P.vx=Math.max(-1,Math.min(1,(t.clientX-L.x)/40)),P.vy=Math.max(-1,Math.min(1,(t.clientY-L.y)/40)))}if(R&&t.identifier==R.id&&state=='play'){P.a+=(t.clientX-R.x)*.006;R.x=t.clientX}}},{passive:false});
+addEventListener('touchend',e=>{for(const t of e.changedTouches){if(L&&t.identifier==L.id){L=null;if(P)P.vx=P.vy=0}if(R&&t.identifier==R.id)R=null}});
+const bt=(id,dn,up)=>{$(id).addEventListener('touchstart',e=>{e.preventDefault();dn()});$(id).addEventListener('touchend',e=>{e.preventDefault();up&&up()})};
+bt('bE',()=>{keys.KeyE=true;if(state=='play')interact()},()=>keys.KeyE=false);bt('bQ',()=>state=='play'&&ayat());bt('bF',()=>{if(state=='play'&&P.bat>5)P.fl=!P.fl});bt('bR',()=>keys.run=true,()=>keys.run=false);bt('bC',()=>addEventListener&&dispatchEvent(new KeyboardEvent('keydown',{code:'KeyC'})));bt('bD',()=>{if(state=='play')djOn=!djOn})}
+
+/* DJ horror (sintesis) */
+let djOn=false,djNext=0,djN=0;
+function kick(t){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(160,t);o.frequency.exponentialRampToValueAtTime(40,t+.14);g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g);g.connect(MG);o.start(t);o.stop(t+.22)}
+function nz(t,d,f,v,ty){const s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;fl.type=ty;fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl);fl.connect(g);g.connect(MG);s.start(t);s.stop(t+d)}
+function bs(t,f,d,v,ty,lp){const o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type=ty;o.frequency.value=f;fl.type='lowpass';fl.frequency.value=lp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl);fl.connect(g);g.connect(MG);o.start(t);o.stop(t+d)}
+const BL=[55,55,65.4,55,49,49,58.3,49],AR=[220,261.6,329.6,261.6,246.9,293.7,370,293.7];
+function djTick(on){if(!AC)return;if(!on){djNext=0;return}const n=AC.currentTime;if(djNext<n-.3)djNext=n+.05;while(djNext<n+.25){const q=djN%16,t=djNext;if(q%4==0)kick(t);if(q%4==2)nz(t,.05,7000,.18,'highpass');if(q==4||q==12)nz(t,.18,1800,.35,'bandpass');if(q%2==0)bs(t,BL[(djN>>1)%8],.2,.25,'sawtooth',320);if(q%3==0&&(djN>>4)%2)bs(t,AR[djN%8],.12,.05,'square',2200);djNext+=.1171875;djN++}}
+/* properti rumah sakit */
+const PS={bed:spr(c=>{c.fillStyle='#777';c.fillRect(4,46,56,4);c.fillRect(6,50,3,14);c.fillRect(55,50,3,14);c.fillStyle='#dde';c.fillRect(6,34,52,13);c.fillStyle='#fff';c.fillRect(8,29,16,8);c.fillStyle='#8a1a1a';c.fillRect(30,36,12,6)}),
+wc:spr(c=>{c.strokeStyle='#999';c.lineWidth=4;c.beginPath();c.arc(22,50,12,0,7);c.stroke();c.fillStyle='#345';c.fillRect(20,20,22,6);c.fillRect(18,20,5,30);c.fillRect(20,36,28,6);c.fillRect(44,36,4,20)}),
+iv:spr(c=>{c.fillStyle='#aaa';c.fillRect(30,6,3,56);c.fillRect(20,60,24,3);c.fillStyle='#cde';c.fillRect(24,8,14,20);c.fillStyle='#b22';c.fillRect(26,16,10,10)})};
+/* avatar */
+const CHR={m:{shirt:'#c0392b',pants:'#2c3e50',skin:'#f1c27d',hair:'#2b1b0e'},f:{shirt:'#8e44ad',pants:'#34495e',skin:'#f1c27d',hair:'#4a2c12',fem:1}};
+[['av0','m'],['av1','f']].forEach(([id,k])=>{const g=$(id).getContext('2d');rbx(g,2.5,12,1.5,CHR[k])});
+{const g=$('tmv').getContext('2d');g.fillStyle='#fff';g.font='bold 12px sans-serif';g.textAlign='center';MC.forEach((o,i)=>{rbx(g,30+i*110,6,1.3,o);g.fillText(NM[i],30+i*110+32,106)})}
+$('cm').addEventListener('click',()=>$('nm').value='Raka');$('cf').addEventListener('click',()=>$('nm').value='Nadia');
+/* intro: kisah pembunuhan di balik RS */
+let PN='Raka',itT=-1,inF={};const IG=$('in').getContext('2d');IG.scale(2,2);
+function typ(s,y,t0,col){const n=Math.max(0,Math.min(s.length,(itT-t0)*24|0)),g=IG;g.fillStyle=col||'#fff';g.font='bold 12px sans-serif';g.textAlign='center';g.shadowColor='#000';g.shadowBlur=5;g.fillText(s.slice(0,n),240,y);g.shadowBlur=0}
+function night(){const g=IG,gr=g.createLinearGradient(0,0,0,270);gr.addColorStop(0,'#060814');gr.addColorStop(1,'#1a2030');g.fillStyle=gr;g.fillRect(0,0,480,270);g.fillStyle='#ccd';g.beginPath();g.arc(400,40,16,0,7);g.fill();
+g.fillStyle='#07090d';g.fillRect(80,80,320,160);g.fillRect(140,50,200,40);g.fillRect(215,30,50,24);
+for(let r=0;r<4;r++)for(let c=0;c<9;c++){g.fillStyle=rnd(r*9+c,itT*3|0)>.9?'#d8c860':'#10151d';g.fillRect(96+c*34,96+r*34,16,20)}
+g.fillStyle=Math.random()<.9?'#c22':'#400';g.fillRect(232,36,16,4);g.fillRect(238,30,4,16);g.fillStyle='#000';g.fillRect(228,205,24,35);g.fillStyle='#030303';g.fillRect(0,240,480,30);
+g.strokeStyle='rgba(140,170,255,.3)';for(let i=0;i<40;i++){const x=Math.random()*480,y=Math.random()*270;g.beginPath();g.moveTo(x,y);g.lineTo(x-3,y+9);g.stroke()}}
+function introDraw(dt){itT+=dt;const g=IG,t=itT;g.textAlign='center';
+if(t<10){night();if(t>5&&t<5.3){g.fillStyle='rgba(255,255,255,.55)';g.fillRect(0,0,480,270)}if(t>5&&!inF.a){inF.a=1;noise(1.8,300,.7)}typ('RS Harapan Sentosa — ditutup sejak 1998.',232,.6);typ('Dulu rumah sakit paling ramai di kota ini.',248,3.6);typ('Tapi di balik temboknya tersimpan kejadian kelam...',264,6.6)}
+else if(t<13){g.fillStyle='#000';g.fillRect(0,0,480,270);typ('13 Agustus 1998, tengah malam...',135,10.4)}
+else if(t<28){const u=t-13;g.fillStyle='#0b1412';g.fillRect(0,0,480,270);g.fillStyle='#17302b';g.beginPath();g.moveTo(0,0);g.lineTo(150,70);g.lineTo(150,200);g.lineTo(0,270);g.fill();g.beginPath();g.moveTo(480,0);g.lineTo(330,70);g.lineTo(330,200);g.lineTo(480,270);g.fill();g.fillStyle='#1d2a33';g.fillRect(150,70,180,130);g.fillStyle='#20302b';g.beginPath();g.moveTo(0,270);g.lineTo(150,200);g.lineTo(330,200);g.lineTo(480,270);g.fill();
+ if(u<7){g.fillStyle=Math.random()<.9?'#cfe':'#455';g.fillRect(190,12,100,6);const nx=40+u*15;rbx(g,nx,112,2,{shirt:'#fff',pants:'#f2f2f2',skin:'#f1c27d',hair:'#111',fem:1});g.fillStyle='#d11';g.fillRect(nx+45,163,10,3);g.fillRect(nx+48.5,159,3,11);g.fillStyle='#fff';g.font='bold 11px sans-serif';g.fillText('Suster Ani',nx+50,104);
+  if(u>3.5){const kx=nx-90+(u-3.5)*14;rbx(g,kx,92,2.4,{shirt:'#000',pants:'#000',skin:'#050505',hair:'#000'});g.fillStyle='#f00';g.fillRect(kx+50,106,3,3);g.fillRect(kx+65,106,3,3)}
+  if(((u*2)|0)!=inF.s){inF.s=(u*2)|0;SND.step()}typ('Suster Ani berjaga sendirian di lorong ini...',250,13.6);typ('Seseorang mengikutinya dari belakang...',264,18)}
+ else{g.fillStyle='#000';g.fillRect(0,0,480,270);if(u<7.4){g.fillStyle='rgba(200,0,0,.6)';g.fillRect(0,0,480,270)}if(!inF.b){inF.b=1;SND.scream()}typ('Suster Ani dibunuh di lorong ini.',110,20.6,'#e55');typ('Pelakunya tak pernah ditemukan.',135,22.6);typ('Arwahnya dan para pasien tak pernah pergi.',160,24.6)}}
+else if(t<38){night();g.globalAlpha=Math.min(1,(t-28)/4);g.drawImage(GS[1],194,52,64,64);g.globalAlpha=1;if(!inF.c){inF.c=1;SND.whisper()}typ('Rumah sakit ditutup. Warga menyebutnya angker.',232,28.6);typ('26 tahun kemudian, tak ada yang berani mendekat.',248,31.6);typ('Kecuali satu tim streamer yang nekat...',264,35)}
+else{night();const A=[{o:CHR[char],n:PN},...MC.map((o,i)=>({o,n:NM[i]}))],sl=1-Math.min(1,(t-38)/3.5);A.forEach((a,i)=>{const x=50+i*98-sl*sl*520,y=156-(sl>0?Math.abs(Math.sin(t*6+i))*5:0);g.fillStyle='rgba(255,240,180,.1)';g.beginPath();g.moveTo(x+60,190);g.lineTo(x+210,150);g.lineTo(x+210,235);g.fill();rbx(g,x,y,1.4,a.o);g.fillStyle='#fff';g.font='bold 11px sans-serif';g.fillText(a.n,x+35,262)});
+ typ(PN+' dan tim live dari sana.',30,38.6);typ("Misi: kumpulkan potongan ayat Al-Qur'an dari Juz 28, 29 dan 30.",48,41);typ('Jawab soal sambung ayat untuk mengusir hantu — lalu kabur selamat!',66,44.5);
+ if(t>48.5){g.fillStyle='rgba(0,0,0,.7)';g.fillRect(0,100,480,70);g.fillStyle='#e22';g.font='bold 40px sans-serif';g.shadowColor='#f00';g.shadowBlur=14;g.fillText('RS ANGKER',240,150);g.shadowBlur=0}
+ if(t>52.5)endIntro()}}
+function begin(){initA();PN=($('nm').value||'Raka').trim().slice(0,12);show('menu',0);itT=0;inF={};state='intro';$('in').style.display='block';$('sk').style.display='block';SND.creak()}
+function endIntro(){if(state!='intro')return;itT=-1;$('in').style.display='none';$('sk').style.display='none';start()}
+$('go').onclick=begin;$('sk').onclick=endIntro;
+const hqT=()=>{$('hq').textContent=$('hq2').textContent='🖥 Grafik: '+(HQ?'HD (960×540)':'Ringan (480p)')};
+$('hq').onclick=$('hq2').onclick=()=>{setQ(HQ?0:1);hqT()};hqT();
+let fN=0,fT=0;function perf(d){if(d>.3)return;fN++;fT+=d;if(fT>3){if(HQ&&fN/fT<20){setQ(0);hqT();say('Grafik otomatis diturunkan ke Ringan agar lancar (ubah di menu Pause).')}fN=0;fT=0}}
+reset();requestAnimationFrame(loop);
+</script></body></html>
